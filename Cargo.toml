@@ -1,0 +1,12 @@
+[workspace]
+members = [
+    "crates/artlang_interpreter",
+    "crates/artlang_parser",
+]
+
+resolver = "3"
+
+[workspace.package]
+name = "ArtLang"
+version = "0.1.0"
+edition = "2024"
