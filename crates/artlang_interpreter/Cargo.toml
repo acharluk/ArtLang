@@ -1,7 +1,8 @@
 [package]
-name = "artlang_interpreter"
+name = "artlang_interpreter3"
 version.workspace = true
 edition.workspace = true
 
 [dependencies]
+artlang_ast = { path = "../artlang_ast" }
 artlang_parser = { path = "../artlang_parser" }

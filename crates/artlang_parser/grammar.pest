@@ -1,1 +1,9 @@
-program = { "test" }
+string = { "\"" ~ (!"\"" ~ ANY)* ~ "\"" | "'" ~ (!"'" ~ ANY)* ~ "'" }
+
+name = { (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
+
+function_call = { name ~ "(" ~ string ~ ("," ~ string)* ~ ")" }
+
+expression = { function_call }
+
+program = { expression }

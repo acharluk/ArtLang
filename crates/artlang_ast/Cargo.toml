@@ -1,0 +1,6 @@
+[package]
+name = "artlang_ast"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

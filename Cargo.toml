@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "crates/artlang_ast",
     "crates/artlang_interpreter",
     "crates/artlang_parser",
 ]
