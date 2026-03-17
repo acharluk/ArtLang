@@ -1,10 +1,10 @@
-use artlang_ast::Expression;
+use artlang_ast::{Expression, Statement};
 use artlang_parser::parse_program;
 
 fn main() {
     match parse_program("print(\"Hello world!\")") {
         Ok(expression) => {
-            execute_expression(expression);
+            execute_program(expression);
         }
         Err(e) => {
             println!("Error parsing the program :(\n{e}")
@@ -12,9 +12,9 @@ fn main() {
     };
 }
 
-fn execute_expression(expression: Expression) {
-    match expression {
-        Expression::FunctionCall(name, args) => {
+fn execute_program(program: Statement) {
+    match program {
+        Statement::FunctionCall(name, args) => {
             if name == "print" {
                 let parts: Vec<String> = args
                     .iter()
