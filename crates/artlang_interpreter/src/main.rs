@@ -1,4 +1,4 @@
-use artlang_ast::{Expression, Statement};
+use artlang_ast::statement::Statement;
 use artlang_parser::parse_program;
 
 fn main() {

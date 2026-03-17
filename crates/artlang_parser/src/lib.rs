@@ -1,4 +1,4 @@
-use artlang_ast::{Expression, Statement};
+use artlang_ast::{expression::Expression, statement::Statement};
 use pest::{Parser, iterators::Pair};
 use pest_derive::Parser;
 
