@@ -1,1 +1,64 @@
-program = { "test" }
+// #region Built-in Pest rules
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" }
+COMMENT    = _{ "--" ~ (!"\n" ~ ANY)* }
+// #endregion
+
+//#region Keywords
+k_open_block = @{ "then" | "do" | "{" }
+k_close_block = @{ "end" | "}" }
+k_if = @{ "if" }
+k_elseif = @{ "elseif" }
+k_else = @{ "else" }
+k_for = @{ "for" }
+k_while = @{ "while" }
+//#endregion
+
+// #region Literals
+null    = { "null" | "nil" }
+boolean = { "true" | "false" }
+number  = { ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
+string  = { "\"" ~ (!"\"" ~ ANY)* ~ "\"" | "'" ~ (!"'" ~ ANY)* ~ "'" }
+// #endregion
+
+// #region Primaries
+name           = { (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
+qualified_name = { name ~ ("." ~ name)* }
+
+function_call = { name ~ "(" ~ string ~ ("," ~ string)* ~ ")" }
+
+primary = { (number | string | boolean | null | function_call | qualified_name) }
+// #endregion
+
+// #region Operators
+add_ops   = { "+" | "-" }
+mul_ops   = { "*" | "//" | "/" | "%" }
+pow_op    = { "^" }
+concat_op = { ".." }
+cmp_ops   = { "<=" | ">=" | "~=" | "==" | "<" | ">" }
+unary_ops = { "not" | "-" | "#" }
+logic_ops = { "and" | "or" }
+// #endregion
+
+// #region Expressions
+expression                = { logical_expression }
+logical_expression        = { comparison ~ (logic_ops ~ comparison)* }
+comparison                = { concat_expression ~ (cmp_ops ~ concat_expression)* }
+concat_expression         = { additive_expression ~ (concat_op ~ additive_expression)* }
+additive_expression       = { multiplicative_expression ~ (add_ops ~ multiplicative_expression)* }
+multiplicative_expression = { unary_expression ~ (mul_ops ~ unary_expression)* }
+unary_expression          = { unary_ops ~ unary_expression | power_expression }
+power_expression          = { primary ~ (pow_op ~ unary_expression)? }
+// #endregion
+
+// #region Statements
+assignment = { qualified_name ~ "=" ~ expression }
+
+if_statement = { k_if ~ expression ~ k_open_block ~ block ~ (k_elseif ~ expression ~ k_open_block ~ block)* ~ (k_else ~ block) ~ k_close_block}
+for_statement = { k_for ~ name ~ "=" ~ expression ~ "," ~ expression ~ ("," ~ expression)? ~ k_open_block ~ block ~ k_close_block }
+while_statement = { k_while ~ expression ~ k_open_block ~ block ~ k_close_block }
+
+statement = { assignment | function_call }
+block     = { statement* }
+// #endregion
+
+program = { SOI ~ block ~ EOI }

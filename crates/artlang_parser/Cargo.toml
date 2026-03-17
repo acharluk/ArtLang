@@ -4,5 +4,6 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+artlang_ast = { path = "../artlang_ast" }
 pest = "2.8.6"
 pest_derive = "2.8.6"

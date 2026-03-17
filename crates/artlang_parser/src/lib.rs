@@ -1,3 +1,4 @@
+use artlang_ast::{expression::Expression, statement::Statement};
 use pest::{Parser, iterators::Pair};
 use pest_derive::Parser;
 
@@ -13,9 +14,51 @@ pub fn print_tree(pair: &Pair<'_, Rule>, indent: usize) {
     }
 }
 
-pub fn parse_program(input: &str) -> Result<Pair<'_, Rule>, String> {
+pub fn print_program(input: &str) {
+    let pairs = ArtLangParser::parse(Rule::program, input);
+    match pairs {
+        Ok(mut pair) => {
+            let program = pair.next().unwrap();
+            print_tree(&program, 0);
+        }
+        Err(e) => {
+            println!("Error parsing :(\n{e}");
+        }
+    }
+}
+
+pub fn parse_program(input: &str) -> Result<Statement, String> {
     let mut pairs =
         ArtLangParser::parse(Rule::program, input).map_err(|e| format!("Parse error:\n{e}"))?;
     let program = pairs.next().unwrap();
-    Ok(program)
+
+    assert_eq!(program.as_rule(), Rule::program);
+
+    let block = program.into_inner().next().unwrap();
+    assert_eq!(block.as_rule(), Rule::block);
+
+    let statement = block.into_inner().next().unwrap();
+    assert_eq!(statement.as_rule(), Rule::statement);
+
+    let function_call = statement.into_inner().next().unwrap();
+    assert_eq!(function_call.as_rule(), Rule::function_call);
+
+    let expression = build_function_call(function_call);
+    Ok(expression)
+}
+
+pub fn build_function_call(pair: Pair<'_, Rule>) -> Statement {
+    assert_eq!(pair.as_rule(), Rule::function_call);
+
+    let mut inner = pair.into_inner();
+    let name = inner.next().unwrap().as_str().to_string();
+    let args: Vec<Expression> = inner.map(build_string).collect();
+    Statement::FunctionCall(name, args)
+}
+
+pub fn build_string(pair: Pair<'_, Rule>) -> Expression {
+    assert_eq!(pair.as_rule(), Rule::string);
+
+    let str = pair.as_str().to_string();
+    Expression::String(str[1..str.len() - 1].to_string())
 }

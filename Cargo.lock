@@ -3,9 +3,14 @@
 version = 4
 
 [[package]]
-name = "artlang_interpreter"
+name = "artlang_ast"
+version = "0.1.0"
+
+[[package]]
+name = "artlang_interpreter3"
 version = "0.1.0"
 dependencies = [
+ "artlang_ast",
  "artlang_parser",
 ]
 
@@ -13,6 +18,7 @@ dependencies = [
 name = "artlang_parser"
 version = "0.1.0"
 dependencies = [
+ "artlang_ast",
  "pest",
  "pest_derive",
 ]
