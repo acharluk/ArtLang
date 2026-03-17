@@ -1,10 +1,10 @@
-use artlang_ast::statement::Statement;
+use artlang_ast::{Block, statement::Statement};
 use artlang_parser::parse_program;
 
 fn main() {
     match parse_program("print(\"Hello world!\")") {
-        Ok(expression) => {
-            execute_program(expression);
+        Ok(program) => {
+            execute_program(program);
         }
         Err(e) => {
             println!("Error parsing the program :(\n{e}")
@@ -13,7 +13,17 @@ fn main() {
 }
 
 fn execute_program(program: Statement) {
-    match program {
+    execute_statement(program);
+}
+
+fn execute_block(block: Block) {
+    for statement in block {
+        execute_statement(statement);
+    }
+}
+
+fn execute_statement(statement: Statement) {
+    match statement {
         Statement::FunctionCall(name, args) => {
             if name == "print" {
                 let parts: Vec<String> = args
@@ -26,8 +36,6 @@ fn execute_program(program: Statement) {
                 print!("{output}");
             }
         }
-        _ => {
-            println!("Nope")
-        }
+        _ => panic!("Not implemented!"),
     }
 }

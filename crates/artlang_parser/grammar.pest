@@ -3,6 +3,16 @@ WHITESPACE = _{ " " | "\t" | "\n" | "\r" }
 COMMENT    = _{ "--" ~ (!"\n" ~ ANY)* }
 // #endregion
 
+//#region Keywords
+k_open_block = @{ "then" | "do" | "{" }
+k_close_block = @{ "end" | "}" }
+k_if = @{ "if" }
+k_elseif = @{ "elseif" }
+k_else = @{ "else" }
+k_for = @{ "for" }
+k_while = @{ "while" }
+//#endregion
+
 // #region Literals
 null    = { "null" | "nil" }
 boolean = { "true" | "false" }
@@ -42,6 +52,10 @@ power_expression          = { primary ~ (pow_op ~ unary_expression)? }
 
 // #region Statements
 assignment = { qualified_name ~ "=" ~ expression }
+
+if_statement = { k_if ~ expression ~ k_open_block ~ block ~ (k_elseif ~ expression ~ k_open_block ~ block)* ~ (k_else ~ block) ~ k_close_block}
+for_statement = { k_for ~ name ~ "=" ~ expression ~ "," ~ expression ~ ("," ~ expression)? ~ k_open_block ~ block ~ k_close_block }
+while_statement = { k_while ~ expression ~ k_open_block ~ block ~ k_close_block }
 
 statement = { assignment | function_call }
 block     = { statement* }
