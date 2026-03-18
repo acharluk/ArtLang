@@ -2,6 +2,10 @@ use artlang_ast::{expression::Expression, statement::Statement};
 use pest::{Parser, iterators::Pair};
 use pest_derive::Parser;
 
+pub mod expressions;
+pub mod operators;
+pub mod statements;
+
 #[derive(Parser)]
 #[grammar = "grammar.pest"]
 pub struct ArtLangParser;
