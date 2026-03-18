@@ -3,7 +3,7 @@ use pest::iterators::Pair;
 
 use crate::Rule;
 
-fn parse_add_operator(pair: &Pair<'_, Rule>) -> BinaryOperator {
+pub fn parse_add_operator(pair: &Pair<'_, Rule>) -> BinaryOperator {
     match pair.as_str() {
         "+" => BinaryOperator::Add,
         "-" => BinaryOperator::Subtract,
@@ -11,7 +11,7 @@ fn parse_add_operator(pair: &Pair<'_, Rule>) -> BinaryOperator {
     }
 }
 
-fn parse_multiply_operator(pair: &Pair<'_, Rule>) -> BinaryOperator {
+pub fn parse_multiply_operator(pair: &Pair<'_, Rule>) -> BinaryOperator {
     match pair.as_str() {
         "*" => BinaryOperator::Multiply,
         "/" => BinaryOperator::Divide,
@@ -21,7 +21,7 @@ fn parse_multiply_operator(pair: &Pair<'_, Rule>) -> BinaryOperator {
     }
 }
 
-fn parse_comparison_operator(pair: &Pair<'_, Rule>) -> BinaryOperator {
+pub fn parse_comparison_operator(pair: &Pair<'_, Rule>) -> BinaryOperator {
     match pair.as_str() {
         "==" => BinaryOperator::Equal,
         "~=" => BinaryOperator::NotEqual,
@@ -33,14 +33,14 @@ fn parse_comparison_operator(pair: &Pair<'_, Rule>) -> BinaryOperator {
     }
 }
 
-fn parse_concatenate_operator(pair: &Pair<'_, Rule>) -> BinaryOperator {
+pub fn parse_concatenate_operator(pair: &Pair<'_, Rule>) -> BinaryOperator {
     match pair.as_str() {
         ".." => BinaryOperator::Concatenate,
         other => unreachable!("Unknown concatenate operator: {other}"),
     }
 }
 
-fn parse_logic_operator(pair: &Pair<'_, Rule>) -> BinaryOperator {
+pub fn parse_logic_operator(pair: &Pair<'_, Rule>) -> BinaryOperator {
     match pair.as_str() {
         "and" => BinaryOperator::And,
         "or" => BinaryOperator::Or,
