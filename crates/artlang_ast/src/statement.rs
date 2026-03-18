@@ -15,7 +15,7 @@ pub enum Statement {
     },
 
     For {
-        var: Name,
+        variable: Name,
         start: Expression,
         limit: Expression,
         step: Option<Expression>,
