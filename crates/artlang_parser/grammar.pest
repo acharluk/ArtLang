@@ -14,19 +14,19 @@ k_while = @{ "while" }
 //#endregion
 
 // #region Literals
-null    = { "null" | "nil" }
-boolean = { "true" | "false" }
-number  = { ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
-string  = { "\"" ~ (!"\"" ~ ANY)* ~ "\"" | "'" ~ (!"'" ~ ANY)* ~ "'" }
+null    = @{ "null" | "nil" }
+boolean = @{ "true" | "false" }
+number  = @{ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
+string  = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" | "'" ~ (!"'" ~ ANY)* ~ "'" }
 // #endregion
 
 // #region Primaries
 name           = { (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
 qualified_name = { name ~ ("." ~ name)* }
 
-function_call = { name ~ "(" ~ string ~ ("," ~ string)* ~ ")" }
+function_call = { qualified_name ~ "(" ~ (expression ~ ("," ~ expression)*)? ~ ")" }
 
-primary = { (number | string | boolean | null | function_call | qualified_name) }
+primary = { (number | string | boolean | null | function_call | qualified_name | "(" ~ expression ~ ")") }
 // #endregion
 
 // #region Operators
@@ -57,7 +57,7 @@ if_statement = { k_if ~ expression ~ k_open_block ~ block ~ (k_elseif ~ expressi
 for_statement = { k_for ~ name ~ "=" ~ expression ~ "," ~ expression ~ ("," ~ expression)? ~ k_open_block ~ block ~ k_close_block }
 while_statement = { k_while ~ expression ~ k_open_block ~ block ~ k_close_block }
 
-statement = { assignment | function_call }
+statement = { assignment | if_statement | for_statement | while_statement | function_call }
 block     = { statement* }
 // #endregion
 

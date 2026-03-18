@@ -56,8 +56,6 @@ pub fn build_function_call(pair: Pair<'_, Rule>) -> Statement {
 }
 
 pub fn build_string(pair: Pair<'_, Rule>) -> Expression {
-    assert_eq!(pair.as_rule(), Rule::string);
-
-    let str = pair.as_str().to_string();
+    let str = pair.as_str();
     Expression::String(str[1..str.len() - 1].to_string())
 }
