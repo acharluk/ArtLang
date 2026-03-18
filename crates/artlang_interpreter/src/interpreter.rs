@@ -1,6 +1,8 @@
 use std::{cell::RefCell, rc::Rc};
 
-use artlang_ast::{Block, Program, expression::Expression, statement::Statement};
+use artlang_ast::{
+    Block, Name, Program, expression::Expression, operators::BinaryOperator, statement::Statement,
+};
 
 use crate::{environment::Environment, value::Value};
 
@@ -41,7 +43,20 @@ impl Interpreter {
                 let value = self.evaluate_expression(expression)?;
                 self.environment.borrow().assign(name, value);
             }
-            _ => panic!("Interpreter::execute_statement not implemented!"),
+            Statement::FunctionCall(name, args) => match name.as_str() {
+                "print" => {
+                    let parts: Vec<String> = args
+                        .iter()
+                        .map(|v| match v {
+                            _ => format!("{v}"),
+                        })
+                        .collect();
+                    let output = parts.join("\t");
+                    print!("{output}");
+                }
+                other => println!("Function '{other}' not found"),
+            },
+            other => panic!("Interpreter::execute_statement ({other:?}) not implemented!"),
         }
 
         Ok(())
@@ -54,6 +69,18 @@ impl Interpreter {
         match expression {
             Expression::Number(n) => Ok(Value::Integer(*n as i64)),
             Expression::String(s) => Ok(Value::String(s.clone())),
+            Expression::BinaryOperator(op, lhs, rhs) => match op {
+                BinaryOperator::Multiply => {
+                    let left = self.evaluate_expression(lhs)?;
+                    let right = self.evaluate_expression(rhs)?;
+
+                    // TODO: Just a test
+                    Ok(left)
+                }
+                other => panic!(
+                    "Interpreter::evaluate_expression::binary_operator: value {other:?} not implemented!"
+                ),
+            },
             other => panic!("Interpreter::evaluate_expression: value ({other:?}) not implemented!"),
         }
     }
