@@ -1,10 +1,16 @@
 use artlang_ast::{Block, statement::Statement};
-use artlang_parser::parse_program;
+use artlang_parser::{parse_program, print_program};
 
 fn main() {
-    match parse_program("print(\"Hello world!\")") {
+    let input = r#"
+        print("Hello world!")
+    "#;
+
+    print_program(input);
+
+    match parse_program(input) {
         Ok(program) => {
-            execute_program(program);
+            execute_block(program);
         }
         Err(e) => {
             println!("Error parsing the program :(\n{e}")

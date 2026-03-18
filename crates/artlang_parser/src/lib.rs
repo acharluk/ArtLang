@@ -1,6 +1,8 @@
-use artlang_ast::{expression::Expression, statement::Statement};
+use artlang_ast::{Block, expression::Expression, statement::Statement};
 use pest::{Parser, iterators::Pair};
 use pest_derive::Parser;
+
+use crate::statements::build_block;
 
 pub mod expressions;
 pub mod operators;
@@ -31,24 +33,17 @@ pub fn print_program(input: &str) {
     }
 }
 
-pub fn parse_program(input: &str) -> Result<Statement, String> {
+pub fn parse_program(input: &str) -> Result<Block, String> {
     let mut pairs =
         ArtLangParser::parse(Rule::program, input).map_err(|e| format!("Parse error:\n{e}"))?;
-    let program = pairs.next().unwrap();
 
+    let program = pairs.next().unwrap();
     assert_eq!(program.as_rule(), Rule::program);
 
     let block = program.into_inner().next().unwrap();
     assert_eq!(block.as_rule(), Rule::block);
 
-    let statement = block.into_inner().next().unwrap();
-    assert_eq!(statement.as_rule(), Rule::statement);
-
-    let function_call = statement.into_inner().next().unwrap();
-    assert_eq!(function_call.as_rule(), Rule::function_call);
-
-    let expression = build_function_call(function_call);
-    Ok(expression)
+    Ok(build_block(block))
 }
 
 pub fn build_function_call(pair: Pair<'_, Rule>) -> Statement {
