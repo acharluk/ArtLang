@@ -136,8 +136,7 @@ pub fn build_primary_expression(pair: Pair<'_, Rule>) -> Expression {
 }
 
 pub fn build_number_expression(pair: Pair<'_, Rule>) -> Expression {
-    // TODO: Trim should not be necessary here, but we get "7 " right now
-    let string = pair.as_str().trim();
+    let string = pair.as_str();
     let number = string.parse::<f64>().unwrap();
 
     if string.contains('.') {

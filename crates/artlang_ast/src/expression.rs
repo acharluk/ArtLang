@@ -25,7 +25,7 @@ impl fmt::Display for Expression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Expression::String(s) => write!(f, "{s}"),
-            _ => write!(f, "Not implemented"),
+            _ => write!(f, "ast::expression: fmt::Display not implemented"),
         }
     }
 }

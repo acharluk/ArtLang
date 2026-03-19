@@ -1,7 +1,10 @@
 use std::{cell::RefCell, rc::Rc};
 
 use artlang_ast::{
-    Block, Name, Program, expression::Expression, operators::BinaryOperator, statement::Statement,
+    Block, Program,
+    expression::Expression,
+    operators::{BinaryOperator, UnaryOperator},
+    statement::Statement,
 };
 
 use crate::{environment::Environment, value::Value};
@@ -43,19 +46,26 @@ impl Interpreter {
                 let value = self.evaluate_expression(expression)?;
                 self.environment.borrow().assign(name, value);
             }
-            Statement::FunctionCall(name, args) => match name.as_str() {
-                "print" => {
-                    let parts: Vec<String> = args
-                        .iter()
-                        .map(|v| match v {
-                            _ => format!("{v}"),
-                        })
-                        .collect();
-                    let output = parts.join("\t");
-                    print!("{output}");
+            Statement::FunctionCall(name, args) => {
+                let mut evaluated_args = Vec::new();
+                for arg in args {
+                    evaluated_args.push(self.evaluate_expression(arg)?);
                 }
-                other => println!("Function '{other}' not found"),
-            },
+
+                match name.as_str() {
+                    "print" => {
+                        let parts: Vec<String> = evaluated_args
+                            .iter()
+                            .map(|v| match v {
+                                _ => format!("{v}"),
+                            })
+                            .collect();
+                        let output = parts.join("\t");
+                        print!("{output}");
+                    }
+                    other => println!("Function '{other}' not found"),
+                }
+            }
             other => panic!("Interpreter::execute_statement ({other:?}) not implemented!"),
         }
 
@@ -68,19 +78,47 @@ impl Interpreter {
     ) -> Result<Value, InterpreterError> {
         match expression {
             Expression::Number(n) => Ok(Value::Integer(*n as i64)),
+            Expression::Float(n) => Ok(Value::Float(*n)),
             Expression::String(s) => Ok(Value::String(s.clone())),
-            Expression::BinaryOperator(op, lhs, rhs) => match op {
-                BinaryOperator::Multiply => {
-                    let left = self.evaluate_expression(lhs)?;
-                    let right = self.evaluate_expression(rhs)?;
+            Expression::Boolean(b) => Ok(Value::Boolean(*b)),
+            Expression::Null => Ok(Value::Null),
+            Expression::Variable(name) => self
+                .environment
+                .borrow()
+                .get(name)
+                .ok_or_else(|| InterpreterError::Runtime(format!("Undefined variable: {name}"))),
+            Expression::BinaryOperator(op, lhs, rhs) => {
+                let left = self.evaluate_expression(lhs)?;
+                let right = self.evaluate_expression(rhs)?;
 
-                    // TODO: Just a test
-                    Ok(left)
-                }
-                other => panic!(
-                    "Interpreter::evaluate_expression::binary_operator: value {other:?} not implemented!"
-                ),
-            },
+                let result = match op {
+                    BinaryOperator::Add => Value::math_add(&left, &right),
+                    BinaryOperator::Subtract => Value::math_sub(&left, &right),
+                    BinaryOperator::Multiply => Value::math_mul(&left, &right),
+                    BinaryOperator::Divide => Value::math_div(&left, &right),
+                    BinaryOperator::IDivide => Value::math_idiv(&left, &right),
+                    BinaryOperator::Modulus => Value::math_mod(&left, &right),
+                    BinaryOperator::Power => Value::math_pow(&left, &right),
+                    BinaryOperator::Concatenate => Value::string_concat(&left, &right),
+                    other => panic!(
+                        "Interpreter::evaluate_expression::binary_operator: value {other:?} not implemented!"
+                    ),
+                };
+
+                result.map_err(InterpreterError::Runtime)
+            }
+            Expression::UnaryOperator(op, val) => {
+                let value = self.evaluate_expression(val)?;
+
+                let result = match op {
+                    UnaryOperator::Minus => Value::math_mul(&value, &Value::Integer(-1)),
+                    other => panic!(
+                        "Interpreter::evaluate_expression::unary_operator: value {other:?} not implemented"
+                    ),
+                };
+
+                result.map_err(InterpreterError::Runtime)
+            }
             other => panic!("Interpreter::evaluate_expression: value ({other:?}) not implemented!"),
         }
     }

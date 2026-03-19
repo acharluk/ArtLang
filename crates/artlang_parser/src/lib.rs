@@ -2,7 +2,7 @@ use artlang_ast::{Block, expression::Expression, statement::Statement};
 use pest::{Parser, iterators::Pair};
 use pest_derive::Parser;
 
-use crate::statements::build_block;
+use crate::{expressions::build_expression, statements::build_block};
 
 pub mod expressions;
 pub mod operators;
@@ -51,7 +51,7 @@ pub fn build_function_call(pair: Pair<'_, Rule>) -> Statement {
 
     let mut inner = pair.into_inner();
     let name = inner.next().unwrap().as_str().to_string();
-    let args: Vec<Expression> = inner.map(build_string).collect();
+    let args: Vec<Expression> = inner.map(build_expression).collect();
     Statement::FunctionCall(name, args)
 }
 

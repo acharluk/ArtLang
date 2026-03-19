@@ -21,8 +21,8 @@ string  = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" | "'" ~ (!"'" ~ ANY)* ~ "'" }
 // #endregion
 
 // #region Primaries
-name           = { (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
-qualified_name = { name ~ ("." ~ name)* }
+name           = @{ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
+qualified_name = @{ name ~ ("." ~ name)* }
 
 function_call = { qualified_name ~ "(" ~ (expression ~ ("," ~ expression)*)? ~ ")" }
 
