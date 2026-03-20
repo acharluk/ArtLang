@@ -66,6 +66,44 @@ impl Interpreter {
                     other => println!("Function '{other}' not found"),
                 }
             }
+            Statement::For {
+                variable,
+                start,
+                limit,
+                step,
+                body,
+            } => {
+                let start_value = self.evaluate_expression(start)?;
+                let limit_value = self.evaluate_expression(limit)?;
+                let step_value = match step {
+                    Some(s) => self.evaluate_expression(s)?,
+                    None => Value::Integer(1),
+                };
+
+                let mut i = start_value
+                    .as_integer()
+                    .map_err(InterpreterError::Runtime)?;
+                let limit = limit_value
+                    .as_integer()
+                    .map_err(InterpreterError::Runtime)?;
+                let step = step_value.as_integer().map_err(InterpreterError::Runtime)?;
+
+                let parent = self.environment.clone();
+                self.environment = Environment::new_child(&parent);
+
+                loop {
+                    if i > limit {
+                        break;
+                    }
+
+                    self.environment.borrow().set(variable, Value::Integer(i));
+                    self.execute_block(body)?;
+
+                    i += step;
+                }
+
+                self.environment = parent;
+            }
             other => panic!("Interpreter::execute_statement ({other:?}) not implemented!"),
         }
 

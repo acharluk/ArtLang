@@ -75,9 +75,16 @@ pub fn build_for_statement(pair: Pair<'_, Rule>) -> Statement {
     assert_eq!(pair.as_rule(), Rule::for_statement);
     let mut inner = pair.into_inner();
 
+    // Skip for keyword
+    inner.next().unwrap();
+
     let variable = inner.next().unwrap().as_str().to_string();
     let start = build_expression(inner.next().unwrap());
     let limit = build_expression(inner.next().unwrap());
+
+    // Skip open block keyword
+    // TODO: Check for step
+    inner.next();
 
     let next = inner.next().unwrap();
     let (step, body) = if next.as_rule() == Rule::expression {

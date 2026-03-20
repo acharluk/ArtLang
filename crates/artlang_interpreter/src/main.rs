@@ -8,8 +8,12 @@ use crate::interpreter::Interpreter;
 
 fn main() {
     let input = r#"
-        a = 7 * 5 - 42 / 2 + -(5 % 3)
-        print("Result is: " .. a)
+        -- a = 7 * 5 - 42 / 2 + -(5 % 3)
+        -- print("Result is: " .. a)
+
+        for b = 1, 10 do
+            print("b = " .. b .. ", ")
+        end
     "#;
 
     match parse_program(input) {
