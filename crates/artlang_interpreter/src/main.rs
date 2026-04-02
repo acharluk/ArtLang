@@ -11,8 +11,14 @@ fn main() {
         -- a = 7 * 5 - 42 / 2 + -(5 % 3)
         -- print("Result is: " .. a)
 
-        for b = 1, 10 do
-            print("b = " .. b .. ", ")
+        -- for b = 1, 10 do
+        --     print("b = " .. b .. ", ")
+        -- end
+
+        c = 1
+        while c < 10 do
+          print("c = " .. c)
+          c = c + 1
         end
     "#;
 

@@ -40,6 +40,17 @@ impl Interpreter {
         Ok(())
     }
 
+    pub fn execute_scoped_block(&mut self, block: &Block) -> Result<(), InterpreterError> {
+        let parent = self.environment.clone();
+        self.environment = Environment::new_child(&parent);
+
+        let result = self.execute_block(block);
+
+        self.environment = parent;
+
+        result
+    }
+
     pub fn execute_statement(&mut self, statement: &Statement) -> Result<(), InterpreterError> {
         match statement {
             Statement::Assignment(name, expression) => {
@@ -104,6 +115,14 @@ impl Interpreter {
 
                 self.environment = parent;
             }
+            Statement::While { condition, body } => loop {
+                let condition_val = self.evaluate_expression(condition)?;
+                if !condition_val.is_truthy() {
+                    break;
+                }
+
+                self.execute_scoped_block(body)?;
+            },
             other => panic!("Interpreter::execute_statement ({other:?}) not implemented!"),
         }
 
@@ -138,6 +157,12 @@ impl Interpreter {
                     BinaryOperator::Modulus => Value::math_mod(&left, &right),
                     BinaryOperator::Power => Value::math_pow(&left, &right),
                     BinaryOperator::Concatenate => Value::string_concat(&left, &right),
+                    BinaryOperator::LessThan => {
+                        let a = left.as_integer();
+                        let b = right.as_integer();
+
+                        Ok(Value::Boolean(a < b))
+                    }
                     other => panic!(
                         "Interpreter::evaluate_expression::binary_operator: value {other:?} not implemented!"
                     ),

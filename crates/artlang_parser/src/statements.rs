@@ -109,7 +109,14 @@ pub fn build_while_statement(pair: Pair<'_, Rule>) -> Statement {
     assert_eq!(pair.as_rule(), Rule::while_statement);
     let mut inner = pair.into_inner();
 
+    // Skip while keyword
+    inner.next();
+
     let condition = build_expression(inner.next().unwrap());
+
+    // Skup open block
+    inner.next();
+
     let body = build_block(inner.next().unwrap());
 
     Statement::While { condition, body }
