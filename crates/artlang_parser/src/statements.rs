@@ -38,14 +38,7 @@ pub fn build_if_statement(pair: Pair<'_, Rule>) -> Statement {
     assert_eq!(pair.as_rule(), Rule::if_statement);
     let mut inner = pair.into_inner();
 
-    // Skip if keyword
-    inner.next();
-
     let condition = build_expression(inner.next().unwrap());
-
-    // Skip open block keyword
-    inner.next();
-
     let then_block = build_block(inner.next().unwrap());
 
     let mut elseif_clauses: Vec<(Expression, Block)> = Vec::new();
@@ -83,16 +76,11 @@ pub fn build_for_statement(pair: Pair<'_, Rule>) -> Statement {
     assert_eq!(pair.as_rule(), Rule::for_statement);
     let mut inner = pair.into_inner();
 
-    // Skip for keyword
-    inner.next().unwrap();
-
     let variable = inner.next().unwrap().as_str().to_string();
     let start = build_expression(inner.next().unwrap());
     let limit = build_expression(inner.next().unwrap());
 
-    // Skip open block keyword
     // TODO: Check for step
-    inner.next();
 
     let next = inner.next().unwrap();
     let (step, body) = if next.as_rule() == Rule::expression {
@@ -117,14 +105,7 @@ pub fn build_while_statement(pair: Pair<'_, Rule>) -> Statement {
     assert_eq!(pair.as_rule(), Rule::while_statement);
     let mut inner = pair.into_inner();
 
-    // Skip while keyword
-    inner.next();
-
     let condition = build_expression(inner.next().unwrap());
-
-    // Skup open block
-    inner.next();
-
     let body = build_block(inner.next().unwrap());
 
     Statement::While { condition, body }
@@ -143,9 +124,6 @@ pub fn build_function_call_statement(pair: Pair<'_, Rule>) -> Statement {
 pub fn build_function_definition_statement(pair: Pair<'_, Rule>) -> Statement {
     assert_eq!(pair.as_rule(), Rule::function_definition);
     let mut inner = pair.into_inner();
-
-    // Consume function keyword
-    inner.next();
 
     let name = inner.next().unwrap().as_str().to_string();
 

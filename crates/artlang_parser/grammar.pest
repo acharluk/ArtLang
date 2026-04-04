@@ -4,15 +4,15 @@ COMMENT    = _{ "--" ~ (!"\n" ~ ANY)* }
 // #endregion
 
 // #region Keywords
-k_open_block  = @{ "then" | "do" | "{" }
-k_close_block = @{ "end" | "}" }
-k_if          = @{ "if" }
-k_elseif      = @{ "elseif" }
-k_else        = @{ "else" }
-k_for         = @{ "for" }
-k_while       = @{ "while" }
-k_function    = @{ "fn" | "function" }
-k_return      = @{ "return" }
+k_open_block  = _{ "then" | "do" | "{" }
+k_close_block = _{ "end" | "}" }
+k_if          = _{ "if" }
+k_elseif      = _{ "elseif" }
+k_else        = _{ "else" }
+k_for         = _{ "for" }
+k_while       = _{ "while" }
+k_function    = _{ "fn" | "function" }
+k_return      = _{ "return" }
 // #endregion
 
 // #region Literals
