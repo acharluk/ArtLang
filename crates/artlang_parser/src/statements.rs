@@ -20,6 +20,7 @@ pub fn build_statement(pair: Pair<'_, Rule>) -> Statement {
         Rule::while_statement => build_while_statement(inner),
         Rule::function_call => build_function_call(inner),
         Rule::function_definition => build_function_definition_statement(inner),
+        Rule::return_statement => build_return_statement(inner),
         other => unreachable!("Unknown statement: {other:?}"),
     }
 }
@@ -137,4 +138,12 @@ pub fn build_function_definition_statement(pair: Pair<'_, Rule>) -> Statement {
     };
 
     Statement::FunctionDefinition { name, params, body }
+}
+
+pub fn build_return_statement(pair: Pair<'_, Rule>) -> Statement {
+    assert_eq!(pair.as_rule(), Rule::return_statement);
+    let mut inner = pair.into_inner();
+    let expression = inner.next().map(build_expression);
+
+    Statement::Return(expression)
 }

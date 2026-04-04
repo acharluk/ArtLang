@@ -170,6 +170,14 @@ impl Interpreter {
                 };
                 self.environment.borrow().assign(name, function);
             }
+            Statement::Return(expression) => {
+                let val = match expression {
+                    Some(e) => self.evaluate_expression(e)?,
+                    None => Value::Null,
+                };
+
+                return Err(InterpreterError::Return(val));
+            }
             other => panic!("Interpreter::execute_statement ({other:?}) not implemented!"),
         }
 
@@ -283,9 +291,12 @@ impl Interpreter {
 
         match result {
             Ok(()) => Ok(Value::Null),
-            Err(..) => Err(InterpreterError::Runtime(format!(
-                "Error executing function",
-            ))),
+            Err(error) => match error {
+                InterpreterError::Return(value) => Ok(value),
+                _ => Err(InterpreterError::Runtime(format!(
+                    "Error executing function",
+                ))),
+            },
         }
     }
 }
