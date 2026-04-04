@@ -135,6 +135,33 @@ impl Interpreter {
 
                 self.execute_scoped_block(body)?;
             },
+            Statement::If {
+                condition,
+                then_block,
+                elseif_clauses,
+                else_block,
+            } => {
+                let condition = self.evaluate_expression(condition)?;
+                if condition.is_truthy() {
+                    self.execute_scoped_block(then_block)?;
+                } else {
+                    let mut matched_elseif = false;
+                    for (elseif_condition, elseif_block) in elseif_clauses {
+                        let condition = self.evaluate_expression(elseif_condition)?;
+                        if condition.is_truthy() {
+                            self.execute_scoped_block(elseif_block)?;
+                            matched_elseif = true;
+                            break;
+                        }
+                    }
+
+                    if !matched_elseif {
+                        if let Some(eb) = else_block {
+                            self.execute_scoped_block(eb)?;
+                        }
+                    }
+                }
+            }
             Statement::FunctionDefinition { name, params, body } => {
                 let function = Value::Function {
                     params: params.clone(),
