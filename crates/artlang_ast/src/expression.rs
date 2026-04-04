@@ -1,7 +1,7 @@
 use std::fmt;
 
 use crate::{
-    Name,
+    Block, Name,
     operators::{BinaryOperator, UnaryOperator},
 };
 
@@ -19,6 +19,8 @@ pub enum Expression {
     UnaryOperator(UnaryOperator, Box<Expression>),
 
     FunctionCall(Name, Vec<Expression>),
+
+    AnonymousFunction { params: Vec<Name>, body: Block },
 }
 
 impl fmt::Display for Expression {

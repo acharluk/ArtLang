@@ -19,6 +19,7 @@ pub fn build_statement(pair: Pair<'_, Rule>) -> Statement {
         Rule::for_statement => build_for_statement(inner),
         Rule::while_statement => build_while_statement(inner),
         Rule::function_call => build_function_call(inner),
+        Rule::function_definition => build_function_definition_statement(inner),
         other => unreachable!("Unknown statement: {other:?}"),
     }
 }
@@ -37,7 +38,14 @@ pub fn build_if_statement(pair: Pair<'_, Rule>) -> Statement {
     assert_eq!(pair.as_rule(), Rule::if_statement);
     let mut inner = pair.into_inner();
 
+    // Skip if keyword
+    inner.next();
+
     let condition = build_expression(inner.next().unwrap());
+
+    // Skip open block keyword
+    inner.next();
+
     let then_block = build_block(inner.next().unwrap());
 
     let mut elseif_clauses: Vec<(Expression, Block)> = Vec::new();
@@ -130,4 +138,25 @@ pub fn build_function_call_statement(pair: Pair<'_, Rule>) -> Statement {
     let args: Vec<Expression> = inner.map(build_expression).collect();
 
     Statement::FunctionCall(name, args)
+}
+
+pub fn build_function_definition_statement(pair: Pair<'_, Rule>) -> Statement {
+    assert_eq!(pair.as_rule(), Rule::function_definition);
+    let mut inner = pair.into_inner();
+
+    // Consume function keyword
+    inner.next();
+
+    let name = inner.next().unwrap().as_str().to_string();
+
+    let next = inner.next().unwrap();
+    let (params, body) = if next.as_rule() == Rule::param_list {
+        let params: Vec<String> = next.into_inner().map(|p| p.as_str().to_string()).collect();
+        let body = build_block(inner.next().unwrap());
+        (params, body)
+    } else {
+        (Vec::new(), build_block(next))
+    };
+
+    Statement::FunctionDefinition { name, params, body }
 }

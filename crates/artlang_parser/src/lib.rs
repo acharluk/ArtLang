@@ -1,4 +1,4 @@
-use artlang_ast::{Block, expression::Expression, statement::Statement};
+use artlang_ast::{Block, Name, expression::Expression, statement::Statement};
 use pest::{Parser, iterators::Pair};
 use pest_derive::Parser;
 
@@ -47,12 +47,18 @@ pub fn parse_program(input: &str) -> Result<Block, String> {
 }
 
 pub fn build_function_call(pair: Pair<'_, Rule>) -> Statement {
+    let (name, args) = build_function_call_parts(pair);
+    Statement::FunctionCall(name, args)
+}
+
+pub fn build_function_call_parts(pair: Pair<'_, Rule>) -> (Name, Vec<Expression>) {
     assert_eq!(pair.as_rule(), Rule::function_call);
 
     let mut inner = pair.into_inner();
     let name = inner.next().unwrap().as_str().to_string();
     let args: Vec<Expression> = inner.map(build_expression).collect();
-    Statement::FunctionCall(name, args)
+
+    (name, args)
 }
 
 pub fn build_string(pair: Pair<'_, Rule>) -> Expression {

@@ -4,7 +4,7 @@ use artlang_ast::{
 };
 use pest::iterators::Pair;
 
-use crate::{Rule, operators};
+use crate::{Rule, build_function_call_parts, operators};
 
 pub fn build_expression(pair: Pair<'_, Rule>) -> Expression {
     match pair.as_rule() {
@@ -40,6 +40,7 @@ pub fn build_expression(pair: Pair<'_, Rule>) -> Expression {
 
         Rule::name => build_variable_expression(pair),
         Rule::qualified_name => build_variable_expression(pair),
+        Rule::function_call => build_function_call_expression(pair),
 
         other => unreachable!("Unknown expression: {other:?}"),
     }
@@ -157,4 +158,9 @@ pub fn build_boolean_expression(pair: Pair<'_, Rule>) -> Expression {
 
 pub fn build_variable_expression(pair: Pair<'_, Rule>) -> Expression {
     Expression::Variable(pair.as_str().to_string())
+}
+
+pub fn build_function_call_expression(pair: Pair<'_, Rule>) -> Expression {
+    let (name, args) = build_function_call_parts(pair);
+    Expression::FunctionCall(name, args)
 }

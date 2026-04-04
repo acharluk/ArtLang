@@ -2,27 +2,32 @@ pub mod environment;
 pub mod interpreter;
 pub mod value;
 
+use std::{env, fs};
+
 use artlang_parser::parse_program;
 
 use crate::interpreter::Interpreter;
 
 fn main() {
-    let input = r#"
-        -- a = 7 * 5 - 42 / 2 + -(5 % 3)
-        -- print("Result is: " .. a)
+    let args: Vec<String> = env::args().collect();
 
-        -- for b = 1, 10 do
-        --     print("b = " .. b .. ", ")
-        -- end
+    if args.len() > 1 {
+        run_file(&args[1]);
+    } else {
+        println!("Usage: art <filename>");
+    }
+}
 
-        c = 1
-        while c < 10 do
-          print("c = " .. c)
-          c = c + 1
-        end
-    "#;
+fn run_file(path: &String) {
+    let source = match fs::read_to_string(path) {
+        Ok(content) => content,
+        Err(error) => {
+            eprintln!("Error reading file '{path}': {error}");
+            std::process::exit(1);
+        }
+    };
 
-    match parse_program(input) {
+    match parse_program(&source) {
         Ok(program) => {
             let mut interpreter = Interpreter::new();
             if let Err(error) = interpreter.run(&program) {

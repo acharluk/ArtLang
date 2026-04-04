@@ -3,15 +3,17 @@ WHITESPACE = _{ " " | "\t" | "\n" | "\r" }
 COMMENT    = _{ "--" ~ (!"\n" ~ ANY)* }
 // #endregion
 
-//#region Keywords
-k_open_block = @{ "then" | "do" | "{" }
+// #region Keywords
+k_open_block  = @{ "then" | "do" | "{" }
 k_close_block = @{ "end" | "}" }
-k_if = @{ "if" }
-k_elseif = @{ "elseif" }
-k_else = @{ "else" }
-k_for = @{ "for" }
-k_while = @{ "while" }
-//#endregion
+k_if          = @{ "if" }
+k_elseif      = @{ "elseif" }
+k_else        = @{ "else" }
+k_for         = @{ "for" }
+k_while       = @{ "while" }
+k_function    = @{ "fn" | "function" }
+k_return      = @{ "return" }
+// #endregion
 
 // #region Literals
 null    = @{ "null" | "nil" }
@@ -24,9 +26,14 @@ string  = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" | "'" ~ (!"'" ~ ANY)* ~ "'" }
 name           = @{ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
 qualified_name = @{ name ~ ("." ~ name)* }
 
+param_list = { name ~ ("," ~ name)* }
+
+function_definition = { k_function ~ name ~ "(" ~ param_list ~ ")" ~ k_open_block? ~ block ~ k_close_block }
+anonymous_function  = { k_function ~ "(" ~ param_list ~ ")" ~ k_open_block? ~ block ~ k_close_block }
+
 function_call = { qualified_name ~ "(" ~ (expression ~ ("," ~ expression)*)? ~ ")" }
 
-primary = { (number | string | boolean | null | function_call | qualified_name | "(" ~ expression ~ ")") }
+primary = { (number | string | boolean | null | anonymous_function | function_call | qualified_name | "(" ~ expression ~ ")") }
 // #endregion
 
 // #region Operators
@@ -53,11 +60,12 @@ power_expression          = { primary ~ (pow_op ~ unary_expression)? }
 // #region Statements
 assignment = { qualified_name ~ "=" ~ expression }
 
-if_statement = { k_if ~ expression ~ k_open_block ~ block ~ (k_elseif ~ expression ~ k_open_block ~ block)* ~ (k_else ~ block) ~ k_close_block}
-for_statement = { k_for ~ name ~ "=" ~ expression ~ "," ~ expression ~ ("," ~ expression)? ~ k_open_block ~ block ~ k_close_block }
-while_statement = { k_while ~ expression ~ k_open_block ~ block ~ k_close_block }
+if_statement     = { k_if ~ expression ~ k_open_block ~ block ~ (k_elseif ~ expression ~ k_open_block ~ block)* ~ (k_else ~ block)? ~ k_close_block }
+for_statement    = { k_for ~ name ~ "=" ~ expression ~ "," ~ expression ~ ("," ~ expression)? ~ k_open_block ~ block ~ k_close_block }
+while_statement  = { k_while ~ expression ~ k_open_block ~ block ~ k_close_block }
+return_statement = { k_return ~ expression? }
 
-statement = { assignment | if_statement | for_statement | while_statement | function_call }
+statement = { assignment | if_statement | for_statement | while_statement | function_definition | return_statement | function_call }
 block     = { statement* }
 // #endregion
 

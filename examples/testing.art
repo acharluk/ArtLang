@@ -1,0 +1,7 @@
+function factorial(a)
+  if a < 1 then return 1 end
+  return a * factorial(a - 1)
+end
+
+fact3 = factorial(3)
+print("Factorial of 3: " .. fact3)

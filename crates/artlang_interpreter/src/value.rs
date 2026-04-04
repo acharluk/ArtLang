@@ -1,4 +1,8 @@
-use std::fmt;
+use std::{cell::RefCell, fmt, rc::Rc};
+
+use artlang_ast::{Block, Name};
+
+use crate::environment::Environment;
 
 #[derive(Clone)]
 pub enum Value {
@@ -7,6 +11,11 @@ pub enum Value {
     Integer(i64),
     Float(f64),
     String(String),
+    Function {
+        params: Vec<Name>,
+        body: Block,
+        environment: Rc<RefCell<Environment>>,
+    },
 }
 
 impl fmt::Debug for Value {
@@ -17,6 +26,11 @@ impl fmt::Debug for Value {
             Value::Integer(n) => write!(f, "Integer({n})"),
             Value::Float(n) => write!(f, "Float({n})"),
             Value::String(s) => write!(f, "String({s:?})"),
+            Value::Function { params, body, .. } => f
+                .debug_struct("Function")
+                .field("params", params)
+                .field("body", body)
+                .finish(),
         }
     }
 }
@@ -29,6 +43,7 @@ impl fmt::Display for Value {
             Value::Integer(n) => write!(f, "{n}"),
             Value::Float(n) => write!(f, "{n}"),
             Value::String(s) => write!(f, "{s}"),
+            Value::Function { .. } => write!(f, "function"),
         }
     }
 }
@@ -73,6 +88,7 @@ impl Value {
             Value::Boolean(_) => "Boolean",
             Value::Integer(_) | Value::Float(_) => "Number",
             Value::String(_) => "String",
+            Value::Function { .. } => "Function",
         }
     }
 

@@ -74,7 +74,9 @@ impl Interpreter {
                         let output = parts.join("\t");
                         print!("{output}");
                     }
-                    other => println!("Function '{other}' not found"),
+                    _ => {
+                        self.call_function(name, &evaluated_args)?;
+                    }
                 }
             }
             Statement::For {
@@ -123,6 +125,14 @@ impl Interpreter {
 
                 self.execute_scoped_block(body)?;
             },
+            Statement::FunctionDefinition { name, params, body } => {
+                let function = Value::Function {
+                    params: params.clone(),
+                    body: body.clone(),
+                    environment: self.environment.clone(),
+                };
+                self.environment.borrow().assign(name, function);
+            }
             other => panic!("Interpreter::execute_statement ({other:?}) not implemented!"),
         }
 
@@ -182,7 +192,63 @@ impl Interpreter {
 
                 result.map_err(InterpreterError::Runtime)
             }
+            Expression::FunctionCall(name, args) => {
+                let mut evaluated_args = Vec::new();
+                for arg in args {
+                    evaluated_args.push(self.evaluate_expression(arg)?);
+                }
+
+                self.call_function(name, &evaluated_args)
+            }
             other => panic!("Interpreter::evaluate_expression: value ({other:?}) not implemented!"),
+        }
+    }
+
+    pub fn call_function(&mut self, name: &str, args: &[Value]) -> Result<Value, InterpreterError> {
+        let lookup = self.environment.borrow().get(name);
+
+        match lookup {
+            Some(Value::Function {
+                params,
+                body,
+                environment,
+            }) => self.call_user_function(&params, &body, &environment, args),
+
+            Some(other) => Err(InterpreterError::Runtime(format!(
+                "Attempted to call a {} value '{name}'",
+                other.type_name()
+            ))),
+
+            None => Err(InterpreterError::Runtime(format!(
+                "Undefined function '{name}'"
+            ))),
+        }
+    }
+
+    pub fn call_user_function(
+        &mut self,
+        params: &[String],
+        body: &Block,
+        environment: &Rc<RefCell<Environment>>,
+        args: &[Value],
+    ) -> Result<Value, InterpreterError> {
+        let caller_environment = self.environment.clone();
+        let function_environment = Environment::new_child(environment);
+
+        for (i, param) in params.iter().enumerate() {
+            let value = args.get(i).cloned().unwrap_or(Value::Null);
+            function_environment.borrow().set(param, value);
+        }
+
+        self.environment = function_environment;
+        let result = self.execute_block(body);
+        self.environment = caller_environment;
+
+        match result {
+            Ok(()) => Ok(Value::Null),
+            Err(..) => Err(InterpreterError::Runtime(format!(
+                "Error executing function",
+            ))),
         }
     }
 }

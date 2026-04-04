@@ -26,6 +26,14 @@ pub enum Statement {
         condition: Expression,
         body: Block,
     },
+
+    FunctionDefinition {
+        name: Name,
+        params: Vec<Name>,
+        body: Block,
+    },
+
+    Return(Option<Expression>),
 }
 
 impl fmt::Display for Statement {
