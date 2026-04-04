@@ -74,6 +74,16 @@ impl Interpreter {
                         let output = parts.join("\t");
                         print!("{output}");
                     }
+                    "println" => {
+                        let parts: Vec<String> = evaluated_args
+                            .iter()
+                            .map(|v| match v {
+                                _ => format!("{v}"),
+                            })
+                            .collect();
+                        let output = parts.join("\t");
+                        print!("{output}\n");
+                    }
                     _ => {
                         self.call_function(name, &evaluated_args)?;
                     }
