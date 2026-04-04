@@ -245,6 +245,11 @@ impl Interpreter {
 
                 self.call_function(name, &evaluated_args)
             }
+            Expression::AnonymousFunction { params, body } => Ok(Value::Function {
+                params: params.clone(),
+                body: body.clone(),
+                environment: self.environment.clone(),
+            }),
             other => panic!("Interpreter::evaluate_expression: value ({other:?}) not implemented!"),
         }
     }

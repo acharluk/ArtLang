@@ -4,7 +4,7 @@ use artlang_ast::{
 };
 use pest::iterators::Pair;
 
-use crate::{Rule, build_function_call_parts, operators};
+use crate::{Rule, build_function_call_parts, operators, statements::build_block};
 
 pub fn build_expression(pair: Pair<'_, Rule>) -> Expression {
     match pair.as_rule() {
@@ -41,6 +41,7 @@ pub fn build_expression(pair: Pair<'_, Rule>) -> Expression {
         Rule::name => build_variable_expression(pair),
         Rule::qualified_name => build_variable_expression(pair),
         Rule::function_call => build_function_call_expression(pair),
+        Rule::anonymous_function => build_anonymous_function_expression(pair),
 
         other => unreachable!("Unknown expression: {other:?}"),
     }
@@ -163,4 +164,21 @@ pub fn build_variable_expression(pair: Pair<'_, Rule>) -> Expression {
 pub fn build_function_call_expression(pair: Pair<'_, Rule>) -> Expression {
     let (name, args) = build_function_call_parts(pair);
     Expression::FunctionCall(name, args)
+}
+
+pub fn build_anonymous_function_expression(pair: Pair<'_, Rule>) -> Expression {
+    assert_eq!(pair.as_rule(), Rule::anonymous_function);
+    let mut inner = pair.into_inner();
+
+    let next = inner.next().unwrap();
+    let (params, body) = if next.as_rule() == Rule::param_list {
+        let params: Vec<String> = next.into_inner().map(|p| p.as_str().to_string()).collect();
+        let body = build_block(inner.next().unwrap());
+
+        (params, body)
+    } else {
+        (Vec::new(), build_block(next))
+    };
+
+    Expression::AnonymousFunction { params, body }
 }
