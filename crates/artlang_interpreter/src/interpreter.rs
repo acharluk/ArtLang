@@ -213,10 +213,24 @@ impl Interpreter {
                     BinaryOperator::Power => Value::math_pow(&left, &right),
                     BinaryOperator::Concatenate => Value::string_concat(&left, &right),
                     BinaryOperator::LessThan => {
-                        let a = left.as_integer();
-                        let b = right.as_integer();
-
-                        Ok(Value::Boolean(a < b))
+                        Ok(Value::Boolean(left.as_number() < right.as_number()))
+                    }
+                    BinaryOperator::LessEqual => {
+                        Ok(Value::Boolean(left.as_number() <= right.as_number()))
+                    }
+                    BinaryOperator::GreaterThan => {
+                        Ok(Value::Boolean(left.as_number() > right.as_number()))
+                    }
+                    BinaryOperator::GreaterEqual => {
+                        Ok(Value::Boolean(left.as_number() >= right.as_number()))
+                    }
+                    BinaryOperator::Equal => {
+                        // TODO: Equal support for all types, not just numbers
+                        Ok(Value::Boolean(left.as_number() == right.as_number()))
+                    }
+                    BinaryOperator::NotEqual => {
+                        // TODO: Not equal support for all types, not just numbers
+                        Ok(Value::Boolean(left.as_number() != right.as_number()))
                     }
                     other => panic!(
                         "Interpreter::evaluate_expression::binary_operator: value {other:?} not implemented!"

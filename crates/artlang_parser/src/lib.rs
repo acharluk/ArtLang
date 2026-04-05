@@ -37,10 +37,7 @@ pub fn parse_program(input: &str) -> Result<Block, String> {
     let mut pairs =
         ArtLangParser::parse(Rule::program, input).map_err(|e| format!("Parse error:\n{e}"))?;
 
-    let program = pairs.next().unwrap();
-    assert_eq!(program.as_rule(), Rule::program);
-
-    let block = program.into_inner().next().unwrap();
+    let block = pairs.next().unwrap();
     assert_eq!(block.as_rule(), Rule::block);
 
     Ok(build_block(block))

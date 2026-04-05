@@ -7,7 +7,7 @@ name = "artlang_ast"
 version = "0.1.0"
 
 [[package]]
-name = "artlang_interpreter3"
+name = "artlang_interpreter"
 version = "0.1.0"
 dependencies = [
  "artlang_ast",

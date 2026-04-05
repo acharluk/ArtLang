@@ -1,5 +1,5 @@
 [package]
-name = "artlang_interpreter3"
+name = "artlang_interpreter"
 version.workspace = true
 edition.workspace = true
 

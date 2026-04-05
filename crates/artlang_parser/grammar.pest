@@ -70,4 +70,4 @@ statement = { assignment | if_statement | for_statement | while_statement | func
 block     = { statement* }
 // #endregion
 
-program = { SOI ~ block ~ EOI }
+program         = _{ SOI ~ block ~ EOI }
