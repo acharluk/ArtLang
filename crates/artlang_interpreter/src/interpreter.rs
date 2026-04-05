@@ -250,6 +250,15 @@ impl Interpreter {
                 body: body.clone(),
                 environment: self.environment.clone(),
             }),
+            Expression::ExpressionCall(callee_expression, arguments) => {
+                let callee = self.evaluate_expression(callee_expression)?;
+                let mut evaluated_args = Vec::new();
+                for arg in arguments {
+                    evaluated_args.push(self.evaluate_expression(arg)?);
+                }
+
+                self.call_value(&callee, &evaluated_args)
+            }
             other => panic!("Interpreter::evaluate_expression: value ({other:?}) not implemented!"),
         }
     }
@@ -302,6 +311,25 @@ impl Interpreter {
                     "Error executing function",
                 ))),
             },
+        }
+    }
+
+    pub fn call_value(
+        &mut self,
+        callee: &Value,
+        arguments: &[Value],
+    ) -> Result<Value, InterpreterError> {
+        match callee {
+            Value::Function {
+                params,
+                body,
+                environment,
+            } => self.call_user_function(params, body, environment, arguments),
+
+            other => Err(InterpreterError::Runtime(format!(
+                "Attempted to call a {} value",
+                other.type_name()
+            ))),
         }
     }
 }

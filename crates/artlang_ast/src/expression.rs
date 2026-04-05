@@ -19,6 +19,7 @@ pub enum Expression {
     UnaryOperator(UnaryOperator, Box<Expression>),
 
     FunctionCall(Name, Vec<Expression>),
+    ExpressionCall(Box<Expression>, Vec<Expression>),
 
     AnonymousFunction { params: Vec<Name>, body: Block },
 }

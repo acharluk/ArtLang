@@ -31,9 +31,10 @@ param_list = { name ~ ("," ~ name)* }
 function_definition = { k_function ~ name ~ "(" ~ param_list ~ ")" ~ k_open_block? ~ block ~ k_close_block }
 anonymous_function  = { k_function ~ "(" ~ param_list ~ ")" ~ k_open_block? ~ block ~ k_close_block }
 
-function_call = { qualified_name ~ "(" ~ (expression ~ ("," ~ expression)*)? ~ ")" }
+function_call  = { qualified_name ~ "(" ~ (expression ~ ("," ~ expression)*)? ~ ")" }
+call_arguments = { "(" ~ (expression ~ ("," ~ expression)*)? ~ ")" }
 
-primary = { (number | string | boolean | null | anonymous_function | function_call | qualified_name | "(" ~ expression ~ ")") }
+primary = { (number | string | boolean | null | anonymous_function | function_call | qualified_name | "(" ~ expression ~ ")") ~ call_arguments* }
 // #endregion
 
 // #region Operators

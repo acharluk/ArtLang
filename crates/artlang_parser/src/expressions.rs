@@ -130,9 +130,14 @@ pub fn build_primary_expression(pair: Pair<'_, Rule>) -> Expression {
     let mut inner = pair.into_inner();
 
     let base_pair = inner.next().unwrap();
-    let expression = build_expression(base_pair);
+    let mut expression = build_expression(base_pair);
 
-    // TODO: Add call args handling
+    for call_args_pair in inner {
+        assert_eq!(call_args_pair.as_rule(), Rule::call_arguments);
+        let arguments: Vec<Expression> =
+            call_args_pair.into_inner().map(build_expression).collect();
+        expression = Expression::ExpressionCall(Box::new(expression), arguments);
+    }
 
     expression
 }

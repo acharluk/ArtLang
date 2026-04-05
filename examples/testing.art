@@ -4,6 +4,8 @@ function adder(first)
   end
 end
 
-add2 = adder(2)
+function apply(f, x)
+  return f(x)
+end
 
-print("Adder test 2 + 5: " .. add2(5))
+print("Adder test 2 + 5: " .. apply(apply(adder, 2), 5))
