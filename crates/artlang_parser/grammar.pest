@@ -71,3 +71,5 @@ block     = { statement* }
 // #endregion
 
 program         = _{ SOI ~ block ~ EOI }
+repl_expression = _{ SOI ~ expression ~ EOI }
+repl_statement  = _{ SOI ~ statement ~ EOI }

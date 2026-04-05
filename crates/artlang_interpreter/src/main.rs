@@ -1,12 +1,13 @@
 pub mod environment;
 pub mod interpreter;
+pub mod repl;
 pub mod value;
 
 use std::{env, fs};
 
 use artlang_parser::parse_program;
 
-use crate::interpreter::Interpreter;
+use crate::{interpreter::Interpreter, repl::run_repl};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -14,7 +15,8 @@ fn main() {
     if args.len() > 1 {
         run_file(&args[1]);
     } else {
-        println!("Usage: art <filename>");
+        // println!("Usage: art <filename>");
+        run_repl();
     }
 }
 

@@ -6,3 +6,4 @@ edition.workspace = true
 [dependencies]
 artlang_ast = { path = "../artlang_ast" }
 artlang_parser = { path = "../artlang_parser" }
+rustyline = "17.0.2"

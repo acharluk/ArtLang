@@ -14,6 +14,15 @@ pub enum InterpreterError {
     Runtime(String),
 }
 
+impl std::fmt::Display for InterpreterError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Return(_) => write!(f, "<return>"),
+            Self::Runtime(msg) => write!(f, "{msg}"),
+        }
+    }
+}
+
 pub struct Interpreter {
     environment: Rc<RefCell<Environment>>,
 }

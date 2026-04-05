@@ -2,7 +2,10 @@ use artlang_ast::{Block, Name, expression::Expression, statement::Statement};
 use pest::{Parser, iterators::Pair};
 use pest_derive::Parser;
 
-use crate::{expressions::build_expression, statements::build_block};
+use crate::{
+    expressions::build_expression,
+    statements::{build_block, build_statement},
+};
 
 pub mod expressions;
 pub mod operators;
@@ -61,4 +64,25 @@ pub fn build_function_call_parts(pair: Pair<'_, Rule>) -> (Name, Vec<Expression>
 pub fn build_string(pair: Pair<'_, Rule>) -> Expression {
     let str = pair.as_str();
     Expression::String(str[1..str.len() - 1].to_string())
+}
+
+pub enum ReplResult {
+    Statement(Statement),
+    Expression(Expression),
+}
+
+pub fn parse_repl_line(input: &str) -> Result<ReplResult, String> {
+    if let Ok(mut pairs) = ArtLangParser::parse(Rule::repl_expression, input) {
+        let pair = pairs.next().unwrap();
+        return Ok(ReplResult::Expression(build_expression(pair)));
+    }
+
+    if let Ok(mut pairs) = ArtLangParser::parse(Rule::repl_statement, input) {
+        let pair = pairs.next().unwrap();
+        return Ok(ReplResult::Statement(build_statement(pair)));
+    }
+
+    Err(ArtLangParser::parse(Rule::repl_statement, input)
+        .map_err(|e| format!("{e}"))
+        .unwrap_err())
 }
