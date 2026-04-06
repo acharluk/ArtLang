@@ -25,14 +25,36 @@ impl std::fmt::Display for InterpreterError {
 
 pub struct Interpreter {
     environment: Rc<RefCell<Environment>>,
+    output: String,
 }
 
 impl Interpreter {
     pub fn new() -> Self {
         let environment = Environment::new_global();
 
-        Interpreter { environment }
+        Interpreter {
+            environment,
+            output: String::new(),
+        }
     }
+
+    // #region Output utilities
+    /**
+     * These utilities allow the interpreter to be used in a cli or non cli environment.
+     * For example, outputing to a file instead of the standard terminal output.
+     */
+    fn write_output(&mut self, s: &str) {
+        self.output.push_str(s);
+    }
+
+    pub fn take_output(&mut self) -> String {
+        std::mem::take(&mut self.output)
+    }
+
+    pub fn get_output(&self) -> &str {
+        &self.output
+    }
+    // #endregion
 
     pub fn run(&mut self, program: &Program) -> Result<(), String> {
         match self.execute_block(program) {
@@ -81,7 +103,7 @@ impl Interpreter {
                             })
                             .collect();
                         let output = parts.join("\t");
-                        print!("{output}");
+                        self.write_output(&output);
                     }
                     "println" => {
                         let parts: Vec<String> = evaluated_args
@@ -91,7 +113,8 @@ impl Interpreter {
                             })
                             .collect();
                         let output = parts.join("\t");
-                        print!("{output}\n");
+                        self.write_output(&output);
+                        self.write_output("\n");
                     }
                     _ => {
                         self.call_function(name, &evaluated_args)?;
