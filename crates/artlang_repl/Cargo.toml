@@ -1,12 +1,14 @@
 [package]
-name = "artlang_interpreter"
+name = "artlang_repl"
 version.workspace = true
 edition.workspace = true
 
 [dependencies]
 artlang_ast = { path = "../artlang_ast" }
+artlang_interpreter = { path = "../artlang_interpreter" }
 artlang_parser = { path = "../artlang_parser" }
+rustyline = "17.0.2"
 
-[lib]
-name = "artlang_interpreter"
-path = "src/lib.rs"
+[[bin]]
+name = "artlang"
+path = "src/main.rs"
