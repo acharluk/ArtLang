@@ -3,6 +3,8 @@ members = [
     "crates/artlang_ast",
     "crates/artlang_interpreter",
     "crates/artlang_parser",
+    "crates/artlang_repl",
+    "crates/artlang_wasm",
 ]
 
 resolver = "3"
