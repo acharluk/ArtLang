@@ -113,7 +113,7 @@ onMounted(() => {
       </div>
       <div class="hidden gap-2 sm:flex">
         <a
-          href="https://github.com/ArtLang"
+          href="https://github.com/ACharLuk/ArtLang"
           target="_blank"
           rel="noopener noreferrer"
           class="btn btn-ghost btn-sm"
